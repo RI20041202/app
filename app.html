@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label, textarea {
+            display: block;
+            margin-bottom: 10px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            font-family: monospace;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>JSON Data Submission</h1>
+    
+    <label for="jsonInput">Enter JSON Data:</label>
+    <textarea id="jsonInput" placeholder='{"data": ["A", "C", "Z", "c", "i"]}'></textarea>
+    
+    <button id="submitBtn">Submit</button>
+
+    <div class="result">
+        <h2>Response</h2>
+        <p>Status: <span id="status"></span></p>
+        <p>User ID: <span id="userId"></span></p>
+        <p>Email: <span id="email"></span></p>
+        <p>Roll Number: <span id="rollNumber"></span></p>
+        <p>Numbers: <span id="numbers"></span></p>
+        <p>Alphabets: <span id="alphabets"></span></p>
+        <p>Highest Lowercase Alphabet: <span id="highestLowercaseAlphabet"></span></p>
+    </div>
+
+    <script>
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const jsonInput = document.getElementById('jsonInput').value;
+            
+            // Validate JSON input
+            let parsedData;
+            try {
+                parsedData = JSON.parse(jsonInput);
+            } catch (error) {
+                alert('Invalid JSON format.');
+                return;
+            }
+            
+            // Send POST request to the backend
+            fetch('http://127.0.0.1:5000', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(parsedData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Fill the response fields
+                document.getElementById('status').innerText = data.is_success;
+                document.getElementById('userId').innerText = data.user_id;
+                document.getElementById('email').innerText = data.email;
+                document.getElementById('rollNumber').innerText = data.roll_number;
+                document.getElementById('numbers').innerText = data.numbers.join(', ');
+                document.getElementById('alphabets').innerText = data.alphabets.join(', ');
+                document.getElementById('highestLowercaseAlphabet').innerText = data.highest_lowercase_alphabet.join(', ');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
